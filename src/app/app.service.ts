@@ -39,7 +39,7 @@ export class AppService
   async agregarDocumento(nombrePersonalizado: string, archivoUrl: string, file: File): Promise<void> {
     const documentosCollection = collection(this.firestore, 'documentos');
 
-    const extension = file.name.split('.').pop();
+    const extension = '.' + file.name.split('.').pop();
     const mimeType = file.type;
     const nombreReal = file.name;
 
