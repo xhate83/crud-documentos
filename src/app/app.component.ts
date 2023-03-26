@@ -1,7 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { AppService } from './app.service';
-import { Observable } from 'rxjs';
-import { Documento } from './documento.model';
+import { FormControl } from '@angular/forms';
 
 @Component({
   selector: 'app-root',
@@ -11,10 +10,29 @@ import { Documento } from './documento.model';
 export class AppComponent {
   title = 'crud-documentos';
   appService = inject(AppService);
-
-  items: Documento[] = [];
+  adjuntoCargado!: File;
+  nombrePersonalizadoControl: FormControl = new FormControl();
+  items: any[] = [];
 
   constructor() {
-    this.appService.getDocumentos().subscribe((res) => this.items = [...res]);
+    this.appService.getDocumentos().subscribe(res => this.items = [...res]);
   }
+
+  
+  cargarDocumento(event: any): void {
+    this.adjuntoCargado = event.target.files[0];
+    console.log(this.adjuntoCargado)
+  }
+
+
+  agregarDocumento(): void {
+
+    console.log(this.adjuntoCargado, this.nombrePersonalizadoControl.value)
+    if(!this.nombrePersonalizadoControl.value || !this.adjuntoCargado){
+      return;
+    }
+
+    this.appService.addDocumento(this.adjuntoCargado, this.nombrePersonalizadoControl.value).subscribe();
+  }
+
 }
