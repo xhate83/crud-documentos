@@ -1,0 +1,20 @@
+
+<p>Listado de documentos</p>
+<div *ngFor="let item of items">
+  <div>
+    Nombre personalizado: {{ item.nombrePersonalizado }}
+  </div>
+  <div>
+    Nombre real: {{ item.nombreReal }}
+  </div>
+  <div>
+    Extensión: {{ item.extension }}
+  </div>
+  <div>
+    Mime Type: {{ item.mimeType }}
+  </div>
+  <div>
+    Adjunto: {{ item.archivo }}
+  </div>
+</div>
+ 
