@@ -12,7 +12,7 @@ export class AppComponent implements OnInit {
   appService = inject(AppService);
   adjuntoCargado!: File;
   nombrePersonalizadoControl: FormControl = new FormControl();
-  displayedColumns: string[] = ['nombrePersonalizado', 'nombreReal', 'extension', 'archivo', 'mimeType'];
+  displayedColumns: string[] = ['nombrePersonalizado', 'nombreReal', 'extension', 'archivo', 'mimeType', 'options'];
   dataSource: any[] = [];
   dataSourceFiltrado: any[] = [];
 
@@ -22,13 +22,21 @@ export class AppComponent implements OnInit {
     this.appService.getDocumentos().subscribe(res => {
       this.dataSource = [...res]
       this.dataSourceFiltrado = [...res]
+      console.log(res)
     });
   }
 
   ngOnInit(): void {
     this.filtroNombrePersonalizado.valueChanges.subscribe(texto => {
       if(texto && texto.length > 1) {
-        this.dataSourceFiltrado = this.dataSource.filter((x) => x.nombrePersonalizado.toLowerCase().includes(texto.toLowerCase()));
+        const textoBuscado = texto.toLowerCase();
+        this.dataSourceFiltrado = this.dataSource.filter((x) =>
+          
+          (x.nombrePersonalizado.toLowerCase().includes(textoBuscado) ||
+          x.extension.toLowerCase().includes(textoBuscado) ||
+          x.nombreReal.toLowerCase().includes(textoBuscado) ||
+          x.mimeType.toLowerCase().includes(textoBuscado))
+        );
       } else {
         this.dataSourceFiltrado = [...this.dataSource];
       }
@@ -41,11 +49,23 @@ export class AppComponent implements OnInit {
   }
 
 
-  agregarDocumento(): void {
+  agregarDocumento(inputFile: HTMLInputElement): void {
     if(!this.nombrePersonalizadoControl.value || !this.adjuntoCargado){
       return;
     }
-    this.appService.addDocumento(this.adjuntoCargado, this.nombrePersonalizadoControl.value).subscribe();
+    this.appService.addDocumento(this.adjuntoCargado, this.nombrePersonalizadoControl.value).subscribe(() => {
+      inputFile.value = '';
+      this.nombrePersonalizadoControl.setValue(null);
+      this.nombrePersonalizadoControl.markAsUntouched();
+    });
+  }
+
+  editarDocumento(element: any) {
+
+  }
+
+  eliminarDocumento(element: any) {
+    this.appService.eliminarDocumentoYAdjunto(element.id, element.archivo);
   }
 
 }

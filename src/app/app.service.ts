@@ -3,7 +3,7 @@
 import { Observable, of } from 'rxjs';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { Injectable, inject } from '@angular/core';
-import { Firestore, collectionData, collection, addDoc } from '@angular/fire/firestore';
+import { Firestore, collectionData, collection, addDoc, doc, deleteDoc } from '@angular/fire/firestore';
 import { finalize } from 'rxjs/operators';
 
 
@@ -20,7 +20,7 @@ export class AppService
 
   getDocumentos(): Observable<any> {
     const collections = collection(this.firestore, 'documentos');
-    return collectionData(collections);
+    return collectionData(collections,{ idField: 'id' });
   }
 
   addDocumento(file: File, nombrePersonalizado: string): Observable<any> {
@@ -64,7 +64,23 @@ export class AppService
 
   }
 
-  deleteDocumento() {
+  async eliminarDocumentoYAdjunto(documentoId: string, archivoUrl: string): Promise<void> {
+    // Eliminar el adjunto en el Storage
+    try {
+      const fileRef = this.storage.refFromURL(archivoUrl);
+      await fileRef.delete().toPromise();
+      console.log('Adjunto eliminado exitosamente');
+    } catch (error) {
+      console.error('Error al eliminar el adjunto:', error);
+    }
 
+    // Eliminar el documento en Firestore
+    try {
+      const documentoRef = doc(this.firestore, 'documentos', documentoId);
+      await deleteDoc(documentoRef);
+      console.log('Documento eliminado exitosamente');
+    } catch (error) {
+      console.error('Error al eliminar el documento:', error);
+    }
   }
 }
